@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Shopping Cart</title>
+  <style>
+    /* Add your CSS styling here */
+  </style>
+</head>
+<body>
+  <h1>Shopping Cart</h1>
+  
+  <div id="cart">
+    <!-- Cart items will be dynamically added here -->
+  </div>
+  
+  <h2>Total Price: $<span id="totalPrice">0</span></h2>
+
+  <script>
+    // Sample data for preselected items
+    const cartItems = [
+      { id: 1, name: "Item 1", price: 10, quantity: 2, liked: false },
+      { id: 2, name: "Item 2", price: 20, quantity: 1, liked: true },
+      // Add more items as needed
+    ];
+
+    const cartContainer = document.getElementById("cart");
+    const totalPriceElement = document.getElementById("totalPrice");
+
+    // Initialize the cart with the preselected items
+    function initializeCart() {
+      cartItems.forEach(item => {
+        const itemElement = createCartItemElement(item);
+        cartContainer.appendChild(itemElement);
+      });
+      updateTotalPrice();
+    }
+
+    // Create a cart item element
+    function createCartItemElement(item) {
+      const itemElement = document.createElement("div");
+      itemElement.className = "cart-item";
+
+      itemElement.innerHTML = `
+        <span>${item.name}</span>
+        <button class="like-button">${item.liked ? "❤️" : "♡"}</button>
+        <button class="quantity-button" data-action="decrease">-</button>
+        <span class="quantity">${item.quantity}</span>
+        <button class="quantity-button" data-action="increase">+</button>
+        <span class="price">$${item.price}</span>
+        <button class="delete-button">Delete</button>
+      `;
+
+      const likeButton = itemElement.querySelector(".like-button");
+      const decreaseButton = itemElement.querySelector('[data-action="decrease"]');
+      const increaseButton = itemElement.querySelector('[data-action="increase"]');
+      const quantityElement = itemElement.querySelector(".quantity");
+      const deleteButton = itemElement.querySelector(".delete-button");
+
+      likeButton.addEventListener("click", () => toggleLike(item));
+      decreaseButton.addEventListener("click", () => adjustQuantity(item, -1));
+      increaseButton.addEventListener("click", () => adjustQuantity(item, 1));
+      deleteButton.addEventListener("click", () => deleteItem(item));
+
+      return itemElement;
+    }
+
+    // Toggle item like status
+    function toggleLike(item) {
+      item.liked = !item.liked;
+      initializeCart();
+    }
+
+    // Adjust item quantity
+    function adjustQuantity(item, amount) {
+      if (item.quantity + amount >= 1) {
+        item.quantity += amount;
+        initializeCart();
+      }
+    }
+
+    // Delete an item from the cart
+    function deleteItem(item) {
+      const index = cartItems.indexOf(item);
+      if (index !== -1) {
+        cartItems.splice(index, 1);
+        initializeCart();
+      }
+    }
+
+    // Update the total price
+    function updateTotalPrice() {
+      const totalPrice = cartItems.reduce((total, item) => total + (item.price * item.quantity), 0);
+      totalPriceElement.textContent = totalPrice;
+    }
+
+    // Initialize the cart when the page loads
+    window.onload = initializeCart;
+  </script>
+</body>
+</html>
